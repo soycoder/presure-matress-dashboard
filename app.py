@@ -1,25 +1,48 @@
 import flask
-from flask import Flask,render_template,url_for,request,send_file
+from flask import Flask,render_template,url_for,request,send_file,jsonify,make_response
 import pickle
 import numpy as np
+import pandas as pd
 
 import time
 from threading import Timer
 run = True
 
-#Initialize the useless part of the base64 encoded image.
-init_Base64 = 21;
+def generateCardRiskPosition():
 
-#Our dictionary
-label_dict = {0:'Cat', 1:'Giraffe', 2:'Sheep', 3:'Bat', 4:'Octopus', 5:'Camel'}
+    date = time.strftime('%Y%m%d')
+
+    # ! Read history
+    # file_name = ("../project-cs-tu-presure-matress/python/history/history-" + date + ".csv")
+    file_name = ("../project-cs-tu-presure-matress/python/history/history-20220301.csv")
+    raw_data = pd.read_csv(file_name, header=None)
+    # print(raw_data)
+    raw_pressure = raw_data[1]
+    raw_class = raw_data[2]
+    index = raw_pressure.index
+    number_of_rows = len(index)
+
+    
 
 
-#Initializing the Default Graph (prevent errors)
-# graph = tf.get_default_graph()
 
-# Use pickle to load in the pre-trained model.
-# with open(f'model_cnn.pkl', 'rb') as f:
-#         model = pickle.load(f)
+    riskList = ["บริเวณก้นกบและสะโพก"]
+
+    # riskList
+    innerHTML = ""
+    for i in riskList:
+        riskTag = (f'''<div class="row">
+            <div class="card mt-10 card-green" style="margin-left: 40px;">
+                <div class="card-body">
+                    <i class="fa fa-plus" style="font-size: 30px;color: #089bab;" ></i>
+                </div>
+            </div>
+            <p class="font-weight-bold" style="margin: auto auto auto 20px;">{i}</p>
+        </div>''')
+        innerHTML += riskTag
+
+    return innerHTML
+
 
 #Initializing new Flask instance. Find the html template in "templates".
 app = flask.Flask(__name__, template_folder='templates')
@@ -49,6 +72,12 @@ def get_image16():
     #    filename = 'error.gif'
     return send_file(filename, mimetype='image/gif')
 
+@app.route('/get_riskPosition')
+def get_riskPosition():
+    response = generateCardRiskPosition()
+    return jsonify({
+        "riskPositionTag":response
+    })
 
 #Second route : Use our model to make prediction - render the results page.
 # @app.route('/predict', methods=['POST'])

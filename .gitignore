@@ -97,6 +97,9 @@ venv.bak/
 Include/
 Scripts/
 
+static/temp
+static/temp16
+
 # Spyder project settings
 .spyderproject
 .spyproject
