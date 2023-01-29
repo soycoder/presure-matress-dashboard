@@ -1,5 +1,5 @@
 import flask
-from flask import Flask,render_template,url_for,request,send_file,jsonify,make_response ,Response
+from flask import Flask, render_template, url_for, request, send_file, jsonify, make_response, Response
 import pickle
 import numpy as np
 import pandas as pd
@@ -7,6 +7,7 @@ import pandas as pd
 import time
 from threading import Timer
 run = True
+
 
 def generateCardRiskPosition():
 
@@ -23,7 +24,7 @@ def generateCardRiskPosition():
     index = raw_pressure.index
     number_of_rows = len(index)
 
-    # print(number_of_rows)
+    print(number_of_rows)
     _class = raw_class[number_of_rows-1]
 
     s_haed = s_shoulder_R = s_shoulder_L = s_elbow_R = s_elbow_L = s_center_hip = s_heel_R = s_heel_L = 0
@@ -31,12 +32,12 @@ def generateCardRiskPosition():
     l_haed = l_shoulder_L = l_elbow_L = l_center_hip = l_talus = 0
     # Risk results
     n_row_fogus = 2
-    max_mmHg = 10
+    max_mmHg = 33
     for i in range(n_row_fogus):
         _pressure = raw_pressure[number_of_rows-i-1]
         # { 1 : "Supine", 2 : "Right", 3 : "Left"}
         _pressure = np.fromstring(_pressure[1:-1], dtype=float, sep=' ')
-        # print(_pressure)
+        print(_pressure)
         _pressure_2d = _pressure.reshape((32, 16))
         max_s_haed = max_s_shoulder_R = max_s_shoulder_L = max_s_elbow_R = max_s_elbow_L = max_s_center_hip = max_s_heel_R = max_s_heel_L = 0
         max_r_haed = max_r_shoulder_R = max_r_elbow_R = max_r_center_hip = max_r_talus = 0
@@ -163,9 +164,9 @@ def generateCardRiskPosition():
         if max_l_talus >= max_mmHg:
             l_talus = l_talus + 1
 
-    # print(s_haed, s_shoulder_R, s_shoulder_L, s_elbow_R, s_elbow_L, s_center_hip, s_heel_R, s_heel_L)
-    # print(r_haed, r_shoulder_R, r_elbow_R, r_center_hip, r_talus)
-    # print(l_haed, l_shoulder_L, l_elbow_L, l_center_hip, l_talus)
+    print(s_haed, s_shoulder_R, s_shoulder_L, s_elbow_R, s_elbow_L, s_center_hip, s_heel_R, s_heel_L)
+    print(r_haed, r_shoulder_R, r_elbow_R, r_center_hip, r_talus)
+    print(l_haed, l_shoulder_L, l_elbow_L, l_center_hip, l_talus)
 
     # Response Back
     riskList = []
@@ -209,71 +210,6 @@ def generateCardRiskPosition():
     if l_talus == n_row_fogus:
         riskList.append("ตาตุ่ม")
 
-    # riskList = ["บริเวณก้นกบและสะโพก"]
+    return riskList
 
-    # riskList
-    innerHTML = ""
-    if len(riskList) == 0:
-        return innerHTML
-    else:
-        for i in riskList:
-            riskTag = (f'''<div class="row">
-                <div class="card mt-10 card-green" style="margin-left: 40px;">
-                    <div class="card-body">
-                        <i class="fa fa-plus" style="font-size: 30px;color: #089bab;" ></i>
-                    </div>
-                </div>
-                <p class="font-weight-bold" style="margin: auto auto auto 20px;">{i}</p>
-            </div>''')
-            innerHTML += riskTag
-
-        return innerHTML
-
-
-#Initializing new Flask instance. Find the html template in "templates".
-app = flask.Flask(__name__, template_folder='templates')
-
-#First route : Render the initial drawing template
-@app.route('/index')
-def index():
-    return render_template('index.html')
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-@app.route('/get_image')
-def get_image():
-    # if request.args.get('type') == '1':
-    filename = './static/temp/test.gif'
-    # else:
-    #    filename = 'error.gif'
-    return send_file(filename, mimetype='image/gif')
-
-@app.route('/get_image16')
-def get_image16():
-    # if request.args.get('type') == '1':
-    filename = './static/temp16/test.gif'
-    # else:
-    #    filename = 'error.gif'
-    return send_file(filename, mimetype='image/gif')
-
-@app.route('/get_mat_plotly')
-def get_mat_plotly():
-    file_name = ("../project-cs-tu-presure-matress/python/images/fig1.png")
-    return send_file(file_name, mimetype='image/png')
-
-@app.route('/get_riskPosition')
-def get_riskPosition():
-    response = generateCardRiskPosition()
-    return jsonify({
-        "riskPositionTag":response
-    })
-
-#Second route : Use our model to make prediction - render the results page.
-# @app.route('/predict', methods=['POST'])
-# def predict():
-        
-
-if __name__ == '__main__':
-	app.run(debug=True)
+print(generateCardRiskPosition())

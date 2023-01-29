@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
 
-  <title>NSC2022</title>
+  <title>Pressure Body Monitoring</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -101,10 +101,17 @@
             <div class="col-6 pl-5 self-card-right">
               <h2 class="text-topic" style="font-family: 'Prompt', sans-serif;">แรงกดของลำตัว</h2>
 
-              <!-- Card -->
-              <div class="card text-center mt-10 card-green">
+              <!-- Card - gif format-->
+              <!-- <div class="card text-center mt-10 card-green" img-mat>
                 <div class="align-middle">
                   <img id="img-mat" class="self-pessure-mat" />
+                </div>
+              </div> -->
+
+              <!-- Card - Plotly format html-->
+              <div class="card text-center mt-10 card-green">
+                <div class="align-middle">
+                  <img id="img-mat-plotly" class="self-pessure-mat" />
                 </div>
               </div>
             </div>
@@ -194,6 +201,10 @@
       document.querySelector(selector).src = "http://127.0.0.1:5000/get_image";
     }
 
+    function setImgPlotly(selector) {
+      document.querySelector(selector).src = "http://127.0.0.1:5000/get_mat_plotly";
+    }
+
     function setRiskPosition(selector) {
       // document.querySelector(selector).innerHTML = '';
       fetch('http://127.0.0.1:5000/get_riskPosition')
@@ -206,14 +217,16 @@
 
 
     setInterval(myTimer, 1000);
-    function myTimer() {
+    // myTimer()
+    async function myTimer() {
       const d = new Date();
       let _result_time = d.toLocaleString("th-TH")
 
       let __time = document.getElementById("time_th");
       __time.innerText = _result_time.split(' ')[1].substring(0, 5) + " น."
-      setImg('#img-mat')
-      setRiskPosition('#riskList')
+      // setImg('#img-mat')
+      await setRiskPosition('#riskList')
+      await setImgPlotly('#img-mat-plotly')
     }
   </script>
 
